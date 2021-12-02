@@ -14,7 +14,6 @@ public class Resp {
     public String status() {
         return status;
     }
-
 }
 
 
