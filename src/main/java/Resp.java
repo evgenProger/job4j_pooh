@@ -6,7 +6,6 @@ public class Resp {
         this.text = text;
         this.status = status;
     }
-
     public String text() {
         return text;
     }

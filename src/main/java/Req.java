@@ -49,5 +49,4 @@ public class Req {
         }
         return new Req(httpType, poohMode, name, param);
     }
-
 }

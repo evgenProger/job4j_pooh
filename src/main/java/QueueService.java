@@ -23,5 +23,4 @@ public class QueueService implements Service {
         }
         return resp;
     }
-
 }
