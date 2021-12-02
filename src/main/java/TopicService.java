@@ -16,7 +16,6 @@ public class TopicService implements Service {
                  q.add(req.getParam());
            }
         }
-
         if ("GET".equals(req.getHttpRequestType())) {
             if (topic.size() == 0) {
                 queue = new ConcurrentLinkedQueue<>();

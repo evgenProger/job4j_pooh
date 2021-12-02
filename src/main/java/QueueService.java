@@ -20,7 +20,6 @@ public class QueueService implements Service {
                status = "200";
            }
            resp = new Resp(text, status);
-
         }
         return resp;
     }
