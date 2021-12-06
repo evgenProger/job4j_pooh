@@ -12,10 +12,11 @@ public class QueueService implements Service {
             concurrentQueue.add(req.getParam());
             queue.putIfAbsent(req.getSourceName(), concurrentQueue);
         } else if ("GET".equals(req.getHttpRequestType())) {
-           String status = null;
+           String status;
            String text = queue.get(req.getSourceName()).poll();
-           if (text.equals(null)) {
+           if (text == null) {
                status = "404";
+               text = "";
            } else {
                status = "200";
            }

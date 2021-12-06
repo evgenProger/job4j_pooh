@@ -7,38 +7,37 @@ public class TopicService implements Service {
 
     @Override
     public Resp process(Req req) {
-        Resp resp = null;
+        String text = "";
+        String status = "204";
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> map = new ConcurrentHashMap<>();
         ConcurrentLinkedQueue<String> queue;
         if ("POST".equals(req.getHttpRequestType())) {
-           map = topic.get(req.getSourceName());
-           for (ConcurrentLinkedQueue<String> q: map.values()) {
-                 q.add(req.getParam());
-           }
+            map = topic.get(req.getSourceName());
+            for (ConcurrentLinkedQueue<String> q : map.values()) {
+                q.add(req.getParam());
+            }
+            status = "200";
         }
         if ("GET".equals(req.getHttpRequestType())) {
-            if (topic.size() == 0) {
+            if (!topic.containsKey(req.getSourceName())) {
                 queue = new ConcurrentLinkedQueue<>();
                 map.putIfAbsent(req.getParam(), queue);
-                topic.putIfAbsent(req.getSourceName(), map);
-            } else {
-                String status = null;
+                topic.put(req.getSourceName(), map);
 
+            } else {
                 if (!topic.get(req.getSourceName()).containsKey(req.getParam())) {
                     queue = new ConcurrentLinkedQueue<>();
                     map = topic.get(req.getSourceName());
                     map.put(req.getParam(), queue);
-                }
-                String text = topic.get(req.getSourceName()).get(req.getParam()).poll();
-                if (text == null) {
-                    text = "";
-                    status = "404";
-                } else {
                     status = "200";
                 }
-                resp = new Resp(text, status);
+            }
+            String valueText = topic.get(req.getSourceName()).get(req.getParam()).poll();
+            if (valueText != null) {
+                text = valueText;
+                status = "200";
             }
         }
-        return resp;
+        return new Resp(text, status);
     }
 }

@@ -16,7 +16,7 @@ public class TopicServiceTest {
                 new Req("GET", "topic", "weather", paramForSubscriber1)
         );
         /* Режим topic. Добавляем данные в топик weather. */
-        topicService.process(
+        Resp result25 =  topicService.process(
                 new Req("POST", "topic", "weather", paramForPublisher)
         );
         /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407. */
@@ -29,6 +29,44 @@ public class TopicServiceTest {
                 new Req("GET", "topic", "weather", paramForSubscriber2)
         );
         assertThat(result1.text(), is("temperature=18"));
+        assertThat(result1.status(), is("200"));
         assertThat(result2.text(), is(""));
+        assertThat(result2.status(), is("200")) ;
+        assertThat(result25.text(), is(""));
+        assertThat(result25.status(), is("200"));
+
+        /*=====================================================================*/
+    /* Режим topic. Добавляем данные в топик weather. Теперь данные должны попасть
+    в обе индивидуальные очереди*/
+        topicService.process(
+                new Req("POST", "topic", "weather", "humidity=70")
+        );
+        /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407. */
+        Resp result3 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+        /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client6565. */
+        Resp result4 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber2)
+        );
+        /* Режим topic. Забираем данные из индивидуальной очереди в топике weather. Очередь client407.
+         * Очередь пустая */
+        Resp result5 = topicService.process(
+                new Req("GET", "topic", "weather", paramForSubscriber1)
+        );
+
+        /*===========================================================*/
+        /* Режим topic. Забираем данные из индивидуальной очереди в топике traffic. Очередь client407.
+         * Еще не подписывались. Очередь пустая */
+        Resp result6 = topicService.process(
+                new Req("GET", "topic", "traffic", paramForSubscriber2)
+        );
+        assertThat(result1.text(), is("temperature=18"));
+        assertThat(result2.text(), is(""));
+        assertThat(result3.text(), is("humidity=70"));
+        assertThat(result4.text(), is("humidity=70"));
+        assertThat(result5.text(), is(""));
+        assertThat(result5.status(), is("204"));
+        assertThat(result6.text(), is(""));
     }
 }
