@@ -7,6 +7,7 @@ public class TopicService implements Service {
 
     @Override
     public Resp process(Req req) {
+        String valueText = null;
         String text = "";
         String status = "204";
         ConcurrentHashMap<String, ConcurrentLinkedQueue<String>> map = new ConcurrentHashMap<>();
@@ -17,27 +18,19 @@ public class TopicService implements Service {
                 q.add(req.getParam());
             }
             status = "200";
-        }
-        if ("GET".equals(req.getHttpRequestType())) {
-            if (!topic.containsKey(req.getSourceName())) {
-                queue = new ConcurrentLinkedQueue<>();
-                map.putIfAbsent(req.getParam(), queue);
-                topic.put(req.getSourceName(), map);
-
-            } else {
-                if (!topic.get(req.getSourceName()).containsKey(req.getParam())) {
-                    queue = new ConcurrentLinkedQueue<>();
-                    map = topic.get(req.getSourceName());
-                    map.put(req.getParam(), queue);
-                    status = "200";
-                }
-            }
-            String valueText = topic.get(req.getSourceName()).get(req.getParam()).poll();
-            if (valueText != null) {
-                text = valueText;
+        } else if ("GET".equals(req.getHttpRequestType())) {
+            topic.putIfAbsent(req.getSourceName(), new ConcurrentHashMap<>());
+            if (topic.get(req.getSourceName()).putIfAbsent(req.getParam(), new ConcurrentLinkedQueue<>()) == null) {
                 status = "200";
             }
+            valueText = topic.get(req.getSourceName()).get(req.getParam()).poll();
         }
-        return new Resp(text, status);
+
+        if (valueText != null) {
+            text = valueText;
+            status = "200";
+        }
+        return new  Resp(text, status);
     }
 }
+

@@ -7,7 +7,7 @@ public class QueueService implements Service {
     @Override
     public Resp process(Req req) {
         ConcurrentLinkedQueue<String> concurrentQueue = new ConcurrentLinkedQueue<>();
-        Resp resp = null;
+        Resp resp = new Resp("", "204");
         if ("POST".equals(req.getHttpRequestType())) {
             concurrentQueue.add(req.getParam());
             queue.putIfAbsent(req.getSourceName(), concurrentQueue);
